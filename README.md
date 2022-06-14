@@ -4,7 +4,7 @@
 
 # Una vez clonado el proyecto, abrimos la carpeta del proyecto y ejecutamos una terminal con los siguientes comandos 
 
-- npm instal
+- npm install
 
 - npm start
 
