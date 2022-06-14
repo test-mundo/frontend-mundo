@@ -4,7 +4,10 @@
 
 # Una vez clonado el proyecto, abrimos la carpeta del proyecto y ejecutamos una terminal con los siguientes comandos 
 
-## ### `npm install`
+- npm instal
 
-### `npm start`
+- npm start
+
+
+Hechos estos pasos el proyecto debería estar funcionanado correctamente 
 
