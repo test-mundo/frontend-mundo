@@ -342,8 +342,6 @@ const Dispositivo = () => {
                 </FormControl>
             </div>
             
-            
-            
                 
             <div  style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
             
