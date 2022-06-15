@@ -2,13 +2,23 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { Autocomplete } from '@mui/material'
+import { Autocomplete, CardContent } from '@mui/material'
 import { FormControl } from '@mui/material'
 import { TextField } from '@mui/material'
 import Button from '@mui/material/Button';
 
 
-import { DataGrid, GridRowsProp, GridColDef, selectedIdsLookupSelector } from '@mui/x-data-grid';
+import { Container, Grid, Paper } from "@mui/material";
+
+
+import { DataGrid} from '@mui/x-data-grid';
+
+import CssBaseline from '@mui/material/CssBaseline';
+import Box from '@mui/material/Box';
+import { height } from '@mui/system'
+
+
+
 
 
 
@@ -35,15 +45,43 @@ const Dispositivo = () => {
     const [marcaLabel, setMarcaLabel] = useState("Marca");
     const [modeloLabel, setModeloLabel] = useState("Modelo");
 
+    const [disable, setDisable] = useState(true);
+
 
     const columns = [
-    { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'nombre_dispositivo', headerName: 'Dispositivo', width: 300 },
-    { field: 'nombre_marca', headerName: 'Marca', width: 300 },
-    { field: 'nombre_modelo', headerName: 'Modelo', width: 300 },
-    { field: 'nombre_bodega', headerName: 'Bodega', width: 300 },
+    { field: 'id', headerName: 'ID', width: 120 },
+    { field: 'nombre_dispositivo', headerName: 'Dispositivo', width: 335 },
+    { field: 'nombre_marca', headerName: 'Marca', width: 335 },
+    { field: 'nombre_modelo', headerName: 'Modelo', width: 335 },
+    { field: 'nombre_bodega', headerName: 'Bodega', width: 335 },
    
     ];
+
+    const activarBoton = async () => {
+        if (bodega_Actual>0 && marca_Actual > 0 && modelo_Actual > 0 && dispositivo.length>0){
+            setDisable(false)
+        }
+    }
+
+
+
+    const todosDispositivos = async () => {
+        const and = await axios 
+        .get("http://127.0.0.1:8000/api/dispositivos/")
+         .then((response)=>{
+            setDispositivo(response.data)
+            return dispositivo                          
+         })
+         .catch((error)=>{
+            console.log(error)
+         })
+    }
+    useEffect(()=>{
+        todosDispositivos().then((datos)=>{
+           })             
+    },[])
+
+   
 
 
     //Método para obtener todas las bodegas existentes en la BD, no recibe nigún parámetro. (Se debe cargar cuando cargue el componente)
@@ -148,16 +186,9 @@ const Dispositivo = () => {
           }
           return opciones;
         })
-        return opciones_modelos;
-        
+        return opciones_modelos; 
      }
-
-      useEffect(()=>{
-        setModeloLabel("Modeloss")
-        obtenerModelos(marca_Actual)
-     },[marca_Actual])
      
- 
      
     //Método para obtener los dispositivos existentes en una bodega
     const obtenerDispositivosBodega = async (id_bodega ) =>{
@@ -166,8 +197,6 @@ const Dispositivo = () => {
          .get("http://127.0.0.1:8000/api/dispositivos/"+id_bodega)
          .then((response)=>{
             setDispositivo(response.data)
-            console.log("La respuesta de response.data es ",response.data)
-            console.log("La respuesta de dispositivo es ", dispositivo)
             return dispositivo                             
          })
          .catch((error)=>{
@@ -183,8 +212,6 @@ const Dispositivo = () => {
          .get("http://127.0.0.1:8000/api/dispositivosmarca/"+bodega_Actual+"/"+id_marca)
          .then((response)=>{
             setDispositivo(response.data)
-           
-
             return dispositivo                             
          })
          .catch((error)=>{
@@ -200,7 +227,6 @@ const Dispositivo = () => {
          .get("http://127.0.0.1:8000/api/dispositivosmodelo/"+bodega_Actual+"/"+marca)
          .then((response)=>{
             setDispositivo(response.data)
-            console.log(response.data)
             return dispositivo                             
          })
          .catch((error)=>{
@@ -212,8 +238,15 @@ const Dispositivo = () => {
      //Método para agregar un dispositivo nuevo 
 
      const agregarDispositivo = async () => { 
+        
+        if(dispositivo_Agregar.length == 0 ){
+            alert("Nombre de dispositivo vacio")
+        } 
+
+        else {
         const ans = await axios 
 
+        
         .post("http://127.0.0.1:8000/api/agregar-dispositivo" ,{
             nombre_dispositivo: dispositivo_Agregar,
             modelo_id : modelo_Actual,
@@ -227,128 +260,125 @@ const Dispositivo = () => {
         .catch(error=>{
             console.log(error)
         })  
+        } 
       }
      
 
-     const cambiar = async (cambio) =>{
-        setMarcaActual(cambio)
-     }
      
-
      
- 
-
 
     return ( 
 
 
-        <div>
-            <FormControl id="formControlaBodega"fullWidth sx={{marginTop:3, ml:2  }}>
-              <Autocomplete              
+    <div style={{background:'cornflowerblue	'}}>
+           
+
+    <Container maxWidth="xlg" >
+      <Grid item xs={12}>
+        <Paper sx={{ p: 0, display: "flex", flexDirection: "column" }}>
+            <h2>Test evaluación programador inicial: LUIS IGNACIO BENÍTEZ ANDRADE</h2>
+
+            <div  style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
+                <FormControl id="formControlaBodega"fullWidth sx={{marginTop:1, ml:-17, width:250  }}>
+                <Autocomplete              
                 fullWidth              
                 onChange={(e, value) => {                    
-                    
-                    //let a = parseInt(value.id)
                     setBodegaActual(value.id)
-                    console.log("valor actual de id bodega value.id es: " + value.id + " y bodega actual hook es "+ bodega_Actual)
-                    obtenerDispositivosBodega( value.id)    
-                    //  console.log(dispositivo)
-                                                                
+                    obtenerDispositivosBodega( value.id)                                             
                 }}                                             
                 id="form_bodega"
                 options={bodega}
                 getOptionLabel={(bodega)=> bodega.nombre_bodega}
                 sx={{ width: 400 }}
                 renderInput={(params1) => 
-                  <TextField {...params1} label={bodegaLabel} 
-                   
-                   required/>
+                    <TextField {...params1} label={bodegaLabel} 
+                    required/>
                 }
-              />
-          </FormControl>
-
-            <FormControl id="formControlaMarcas"fullWidth sx={{marginTop:1, ml:2  }}>
-            <Autocomplete              
-            fullWidth              
-            onChange={(e, value) => {                    
-                    
-                setMarcaActual(value.id)
-                cambiar(value.id)
-                obtenerModelos(value.id)
-                obtenerDispositivosMarca( value.id)
-                setModeloLabel("Modelossss")
-                console.log("valor actual de id marca es: " + value.id + " y marca actual hook es "+ marca_Actual)
-                                                            
-            }}                                                
-                                                       
-            id="form_marca"
-            options={marca}
-            getOptionLabel={(marca)=> marca.nombre_marca}
-            sx={{ width: 400 }}
-            renderInput={(params1) => 
-                <TextField {...params1} label={marcaLabel} 
-                
-                required/>
-            }
-            />
-            </FormControl>
-
-
-            <FormControl id="formControlaModelos"fullWidth sx={{marginTop:1, ml:2  }}>
-            <Autocomplete              
-            fullWidth              
-            onChange={(e, value) => {                    
-                    
-                setModeloActual(value.id)
-                obtenerDispositivosModelo(value.id)
-                console.log(modeloLabel)
-
-                                                            
-            }}                                      
-                                                       
-            id="form_modelo"
-            options={modelo}
-            getOptionLabel={(modelo)=> modelo.nombre_modelo}
-            sx={{ width: 400 }}
-            renderInput={(params1) => 
-                <TextField {...params1} label={modeloLabel} value={modeloLabel} required/>}/>
-            </FormControl>
-
-
-            <FormControl id="formIngresar"fullWidth sx={{marginTop:-1, ml:2  }}>
-            <TextField
-              fullWidth   
-              sx={{ width: 400}}
-              margin="normal"
-              required              
-              id="dispositivo"
-              label="Nombre Dispositivo"
-              //name="cluis"
-              //autoComplete="cluis"
-              //autoFocus
-              value={dispositivo_Agregar}
-              onChange={ (e) => {
-                setDispositivoAgregar(e.target.value)
-                console.log(dispositivo_Agregar)
-                }}
-            />
-            </FormControl>
-
-            <Button variant="contained" sx={{  width: 300, marginTop:1, ml:-75}} onClick={ () => agregarDispositivo() } > Agregar Dispositivo</Button>
-
-            
-         
-
-            <div style={{ height: 700, width: '90%' }}>
-            <DataGrid rows={dispositivo} columns={columns} />
+                />
+                </FormControl>
             </div>
 
-        </div>
+        
+            <div  style={{display: 'flex',  justifyContent:'center', alignItems:'center' }}>
+                <FormControl id="formControlaMarcas"fullWidth sx={{marginTop:1, ml:-17, width:250 }}>
+                <Autocomplete              
+                fullWidth              
+                onChange={(e, value) => {                    
+                        
+                    setMarcaActual(value.id)
+                    obtenerModelos(value.id)
+                    obtenerDispositivosMarca( value.id)
+                    setModeloLabel("Modelos")  
+                                                                
+                }}                                                
+                                                            
+                id="form_marca"
+                options={marca}
+                getOptionLabel={(marca)=> marca.nombre_marca}
+                sx={{ width: 400 }}
+                renderInput={(params1) => 
+                    <TextField {...params1} label={marcaLabel} 
+                    
+                    required/>
+                }
+                />
+                </FormControl>
+            </div>
 
-       
+            <div  style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
+                <FormControl id="formControlaModelos"fullWidth sx={{marginTop:1, ml:-17, width:250  }}>
+                <Autocomplete              
+                fullWidth              
+                onChange={(e, value) => {                    
+                    setModeloActual(value.id)
+                    obtenerDispositivosModelo(value.id)
+                }}                                                                             
+                id="form_modelo"
+                options={modelo}
+                getOptionLabel={(modelo)=> modelo.nombre_modelo}
+                sx={{ width: 400 }}
+                renderInput={(params1) => 
+                    <TextField {...params1} label={modeloLabel} value={modeloLabel} required/>}/>
+                </FormControl>
+            </div>
+            
+            
+            
+                
+            <div  style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
+            
+                <FormControl id="formIngresar"fullWidth sx={{marginTop:1, ml:-17, width:250  }}>
+                <TextField
+                fullWidth   
+                sx={{ width: 400}}
+                margin="normal"
+                required              
+                id="dispositivo"
+                label="Nombre Dispositivo"
+                value={dispositivo_Agregar}
+                onChange={ (e) => {
+                    setDispositivoAgregar(e.target.value)
+                    activarBoton()
+                    
+                    }}
+                />
+                </FormControl>
+            </div>    
 
 
+            <div  style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
+                <Button  disabled={disable} variant="contained" sx={{  width: 250, marginTop:1, ml:1}} onClick={ () => agregarDispositivo() } > Agregar Dispositivo</Button>
+            </div>
 
+
+            <div style={{ height: 630, width: "90%" }}>
+                <DataGrid sx={{  marginTop:2, ml:23}} rows={dispositivo} columns={columns} pageSize={10}/>
+            </div>
+        </Paper>
+      </Grid>
+    </Container>
+
+    </div>
     );
 }
  
